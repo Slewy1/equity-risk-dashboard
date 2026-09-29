@@ -1,3 +1,4 @@
+CREATE VIEW risk_metrics_view AS (
 WITH previous AS (SELECT
     ticker,
     date,
@@ -40,16 +41,16 @@ SELECT
     ticker,
     date,
     close,
-    round(daily_return, 2) AS daily_return,
-    round(volatility, 2) AS volatility,
-    round(cumulative_wealth, 2) AS cumulative_wealth,
-    round(running_peak, 2) AS running_peak,
-    round((cumulative_wealth - running_peak) / running_peak, 2) AS drawdown
+    daily_return,
+    volatility,
+    cumulative_wealth,
+    running_peak,
+    (cumulative_wealth - running_peak) / running_peak AS drawdown
 FROM peak
+);
 
 
-
-
+CREATE VIEW correlation_view AS (
 WITH previous AS (SELECT
     ticker,
     date,
@@ -82,6 +83,7 @@ WHERE a.ticker > b.ticker
 SELECT
     asset_a,
     asset_b,
-    ROUND(CORR(asset_a_return, asset_b_return)::numeric, 2) AS correlation
+    CORR(asset_a_return, asset_b_return) AS correlation
 FROM correlation_setup
 GROUP BY asset_a, asset_b
+);
