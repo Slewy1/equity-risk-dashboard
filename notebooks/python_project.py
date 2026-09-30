@@ -51,3 +51,17 @@ with engine.connect() as conn:
 with engine.connect() as conn:
     result = conn.execute(sqlalchemy.text("SELECT COUNT(*) FROM prices"))
     print(result.fetchone())
+
+risk_metric = pd.read_sql('risk_metrics_view', engine)
+correlation = pd.read_sql('correlation_view', engine)
+
+summary = risk_metric.groupby("ticker").agg(
+    max_drawdown=('drawdown','min'),
+    final_wealth=('cumulative_wealth','last'),
+    volatility=('volatility', 'mean')
+)
+
+# percentage return
+summary['total_return'] = (summary["final_wealth"] - 1000) / 1000 * 100
+
+print(summary)

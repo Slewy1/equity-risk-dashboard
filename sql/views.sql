@@ -1,4 +1,4 @@
-CREATE VIEW risk_metrics_view AS (
+CREATE OR REPLACE VIEW risk_metrics_view AS (
 WITH previous AS (SELECT
     ticker,
     date,
@@ -20,7 +20,7 @@ cumvol AS (SELECT
     date,
     close,
     daily_return,
-    STDDEV_SAMP(daily_return) OVER (PARTITION BY ticker ORDER BY date ROWS BETWEEN 2 PRECEDING AND CURRENT ROW) AS volatility,
+    STDDEV_SAMP(daily_return) OVER (PARTITION BY ticker ORDER BY date ROWS BETWEEN 19 PRECEDING AND CURRENT ROW) AS volatility,
     1000 * EXP(SUM(LN(1 + COALESCE(daily_return, 0))) OVER (PARTITION BY ticker ORDER BY date)) AS cumulative_wealth
 FROM returns
 ),
