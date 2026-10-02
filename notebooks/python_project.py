@@ -3,6 +3,7 @@ import pandas as pd
 import sqlalchemy
 from dotenv import load_dotenv
 import os
+import numpy as np
 
 load_dotenv()
 
@@ -65,3 +66,18 @@ summary = risk_metric.groupby("ticker").agg(
 summary['total_return'] = (summary["final_wealth"] - 1000) / 1000 * 100
 
 print(summary)
+
+correlation_pivot = correlation.pivot_table(
+    index="asset_a",
+    columns="asset_b",
+    values="correlation"
+)
+
+# Include all tickers in both asset a and b
+all_tickers = sorted(set(correlation['asset_a']).union(correlation['asset_b']))
+correlation_pivot = correlation_pivot.reindex(index=all_tickers, columns=all_tickers)
+# Fill NaN with correct values
+correlation_pivot = correlation_pivot.fillna(correlation_pivot.T)
+np.fill_diagonal(correlation_pivot.values, 1.0)
+
+print(correlation_pivot)
